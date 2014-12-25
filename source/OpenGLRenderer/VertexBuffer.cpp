@@ -2,7 +2,7 @@
 
 #include <vector>
 
-VertexBuffer::VertexBuffer(void* pVertexBuffer, GLuint vertexStructureSize, GLuint vertexBufferLength, GLenum usage, const unsigned char* pIndexBuffer, GLuint indexBufferLength, bool bPT) :
+VertexBuffer::VertexBuffer(const void* pVertexBuffer, GLuint vertexStructureSize, GLuint vertexBufferLength, GLenum usage, const unsigned char* pIndexBuffer, GLuint indexBufferLength, bool bPT) :
 	m_length(vertexBufferLength), m_size(vertexStructureSize * vertexBufferLength)
 {
 	assert(pIndexBuffer != nullptr);

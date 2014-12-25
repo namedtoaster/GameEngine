@@ -44,6 +44,10 @@ void LoadResourceFile(const std::string& file, Game& game, const std::string& fo
 				{
 					bSuccess = gfxResourceManager.LoadCursor(id, fileName);
 				}
+				else if(type == "PLY")
+				{
+					bSuccess = gfxResourceManager.LoadPLY(id, fileName);
+				}
 				else if(type == "texture")
 				{
 					bSuccess = gfxResourceManager.LoadTexture(id,fileName);

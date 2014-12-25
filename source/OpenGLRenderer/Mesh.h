@@ -8,7 +8,7 @@ class Mesh
 {
 public:
 
-	Mesh();
+	Mesh(class PLYResource* pPly);
 
 	void Bind();
 	void Draw() const;

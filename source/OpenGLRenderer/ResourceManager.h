@@ -8,6 +8,7 @@
 #include <glm/vec4.hpp>
 #include <unordered_map>
 #include <array>
+#include <vector>
 
 // Valid resource types
 enum class ResourceType
@@ -17,7 +18,8 @@ enum class ResourceType
 	Animation,
 	Font,
 	Shader,
-	TexturedShader
+	TexturedShader,
+	PLY,
 };
 
 // Resource Interface
@@ -57,6 +59,33 @@ private:
 	int m_iWidth;
 	int m_iHeight;
 	unsigned char* m_pImg;
+};
+
+class PLYResource : public IResource
+{
+public:
+
+	// TODO: instead of passing in the verts and the faces, let the ply resource load the file?
+	PLYResource(const std::vector<float>& vertices, const std::vector<int>& faces,
+				int numVertices, int vertexStructureSize);
+
+	void* QueryInterface(ResourceType type) const override;
+
+	const std::vector<float>& GetVertices() const;
+	const std::vector<int>& GetFaces() const;
+	int GetNumVertices() const;
+	int GetVertexStructureSize() const;
+
+protected:
+
+	virtual ~PLYResource() {}
+
+private:
+
+	std::vector<float> m_vertices;
+	std::vector<int> m_faces;
+	int m_numVertices;
+	int m_vertexStructureSize;
 };
 
 class OpenGLResource : public IResource
@@ -237,6 +266,8 @@ public:
 
 	bool LoadCursor(const std::string& id, const std::string& file) override;
 
+	bool LoadPLY(const std::string& id, const std::string& file) override;
+
 	bool LoadTexture(const std::string& id, const std::string& file) override;
 
 	bool LoadAnimation(const std::string& id, const std::string& file) override;
@@ -262,6 +293,8 @@ private:
 	typedef std::unordered_map<std::string, IResource*> ResourceMap;
 
 	ResourceMap m_resources;
+
+	bool CreatePLYResource(const std::string& file, std::vector<float>& vertices, std::vector<int>& faces, int& numVertices, int& numVertexComponents);
 
 	bool CreateTexture(const std::string& file, int& width, int& height, int& comp, unsigned char** pImgData);
 	bool CreateOpenGLTexture(const std::string& file, int& width, int& height, int& comp, unsigned char** pImgData, GLuint& out);

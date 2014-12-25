@@ -37,28 +37,35 @@ public:
 
 	/** Loads a cursor
 	 * id: uniqueID to be used
-	 * file: imgage
+	 * file: image to be loaded
 	 * return: true if the texture is or was loaded, false on error
 	 **/
 	virtual bool LoadCursor(const std::string& id, const std::string& file) = 0;
 
+	/** Loads a PLY file which describes 3D vertices, more info at: http://en.wikipedia.org/wiki/PLY_%28file_format%29
+	 * id: uniqueID to be used
+	 * file: text PLY file
+	 * return: true if the PLY file is or was loaded, false on error
+	 **/
+	virtual bool LoadPLY(const std::string& id, const std::string& file) = 0;
+
 	/** Loads a texture
 	 * id: uniqueID to be used
-	 * file: imgage
+	 * file: image to be loaded
 	 * return: true if the texture is or was loaded, false on error
 	 **/
 	virtual bool LoadTexture(const std::string& id, const std::string& file) = 0;
 
 	/** Loads a sprite animation
 	 * id: uniqueID to be used
-	 * file: img
+	 * file: image to be loaded
 	 * return: true if the sprite animation is or was loaded, false on error
 	 **/
 	virtual bool LoadAnimation(const std::string& id, const std::string& file) = 0;
 
 	/** Loads a font
 	 * id: uniqueID to be used
-	 * file: img
+	 * file: image to be loaded
 	 * return: true if the font is or was loaded, false on error
 	 **/
 	virtual bool LoadFont(const std::string& id, const std::string& file) = 0;

@@ -1,8 +1,9 @@
 ﻿
 #include "ResourceManager.h"
 #include "Log.h"
+#include <glm/vec3.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <sstream>
-#include <vector>
 #include <cstring>
 
 #ifdef _MSC_VER
@@ -43,6 +44,41 @@ int Cursor::GetHeight() const
 const unsigned char* Cursor::GetImgData() const
 {
 	return m_pImg;
+}
+
+PLYResource::PLYResource(const std::vector<float>& vertices, const std::vector<int>& faces, int numVertices, int vertexStructureSize)
+	: m_vertices(vertices), m_faces(faces), m_numVertices(numVertices), m_vertexStructureSize(vertexStructureSize)
+{
+}
+
+void* PLYResource::QueryInterface(ResourceType type) const
+{
+	if (type == ResourceType::PLY)
+	{
+		return (void*)this;
+	}
+
+	return nullptr;
+}
+
+const std::vector<float>& PLYResource::GetVertices() const
+{
+	return m_vertices;
+}
+
+const std::vector<int>& PLYResource::GetFaces() const
+{
+	return m_faces;
+}
+
+int PLYResource::GetNumVertices() const
+{
+	return m_numVertices;
+}
+
+int PLYResource::GetVertexStructureSize() const
+{
+	return m_vertexStructureSize;
 }
 
 OpenGLResource::OpenGLResource(GLuint id) : m_id(id)
@@ -445,6 +481,150 @@ void ResourceManager::GetOpenGLFormat(int comp, GLenum& format, GLint& internalF
 	}
 }
 
+bool ResourceManager::CreatePLYResource(const std::string &file, std::vector<float> &vertices, std::vector<int> &faces, int& numVertices, int& numVertexComponents)
+{
+	std::fstream inStream;
+	inStream.open(file);
+
+	if(!inStream.is_open())
+		return false;
+
+	std::string line;
+	inStream >> line;
+
+	if(line != "ply")
+		return false;
+
+	bool endOfHeader = false;
+	int numFaces = 0;
+	int currentVertex = 0;
+	numVertexComponents = 0;
+	numVertices = 0;
+
+	while(std::getline(inStream, line))
+	{
+		if(line.empty())
+			continue;
+
+		std::stringstream stream;
+		stream << line;
+
+		if(endOfHeader == false)
+		{
+			std::string command;
+			stream >> command;
+			if(command == "format")
+			{
+				std::string arg;
+				stream >> arg;
+
+				if(arg != "ascii")
+				{
+					return false;
+				}
+			}
+			else if(command == "element")
+			{
+				std::string arg;
+				stream >> arg;
+
+				int numberOfElements = 0;
+				stream >> numberOfElements;
+
+				if(arg == "vertex")
+				{
+					numVertices = numberOfElements;
+				}
+				else if(arg == "face")
+				{
+					numFaces = numberOfElements;
+				}
+			}
+			else if(command == "property")
+			{
+				std::string arg;
+				stream >> arg;
+
+				if(arg == "float")
+				{
+					/*(std::string value;
+					stream >> value;
+
+					if(value == "x" || value == "y" || value == "z")
+					{
+						numVertexComponents++;
+					}
+					else
+					{
+						// Add texture coords here
+					}*/
+					numVertexComponents++;
+				}
+				else if(arg == "list")
+				{
+
+				}
+			}
+			else if(command == "end_header")
+			{
+				endOfHeader = true;
+			}
+			else if(command != "comment")
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if(currentVertex < numVertices)
+			{
+				if(vertices.empty())
+				{
+					vertices.resize(numVertices * numVertexComponents);
+				}
+
+				for(int i = 0; i < numVertexComponents; ++i)
+				{
+					stream >> vertices[currentVertex * numVertexComponents + i];
+				}
+
+				++currentVertex;
+			}
+			else
+			{
+				int listSize = 0;
+				stream >> listSize;
+
+				std::vector<int> faceList(listSize);
+
+				for(int i = 0; i < listSize; ++i)
+				{
+					stream >> faceList[i];
+				}
+
+				if(listSize == 3)
+				{
+					// Triangle face list
+					faces.insert(faces.end(), faceList.begin(), faceList.end());
+				}
+				else if(listSize == 4)
+				{
+					// Quad face list
+					faces.push_back(faceList[0]);
+					faces.push_back(faceList[1]);
+					faces.push_back(faceList[2]);
+
+					faces.push_back(faceList[2]);
+					faces.push_back(faceList[3]);
+					faces.push_back(faceList[0]);
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
 bool ResourceManager::CreateTexture(const std::string& file, int& width, int& height, int& comp, unsigned char** pImgData)
 {
 	if(pImgData == nullptr)
@@ -485,6 +665,7 @@ bool ResourceManager::CreateOpenGLTexture(const std::string& file, int& width, i
 
 bool ResourceManager::LoadCursor(const std::string& id, const std::string& file)
 {
+	// todo: avoid code duplicaiton here by using a macro of some sort.
 	auto iter = m_resources.find(id);
 	if(iter != m_resources.end())
 	{
@@ -501,6 +682,28 @@ bool ResourceManager::LoadCursor(const std::string& id, const std::string& file)
 		m_resources.emplace(id, new Cursor(width, height, pImg));
 	}
 	return success;
+}
+
+bool ResourceManager::LoadPLY(const std::string& id, const std::string& file)
+{
+	auto iter = m_resources.find(id);
+	if(iter != m_resources.end())
+	{
+		// ID is taken, resource must be a cursor
+		return (iter->second->QueryInterface(ResourceType::PLY) != nullptr);
+	}
+
+	std::vector<float> vertices;
+	std::vector<int> faces;
+	int numVertices = 0;
+	int numVertexComponents = 0;
+
+	if(CreatePLYResource(file, vertices, faces, numVertices, numVertexComponents) == false)
+		return false;
+
+	m_resources.emplace(id, new PLYResource(vertices, faces, numVertices, numVertexComponents * 4));
+
+	return true;
 }
 
 bool ResourceManager::LoadTexture(const std::string& id, const std::string& file)

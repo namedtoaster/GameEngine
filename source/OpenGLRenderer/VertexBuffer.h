@@ -19,7 +19,7 @@ public:
 	// pIndexBuffer: pointer to the index buffer. This pointer cannot be null
 	// indexBufferLength: length of the index buffer
 	// bPT: should be true if the vertex structure uses a texture, else false
-	VertexBuffer(void* pVertexBuffer, GLuint vertexStructureSize, GLuint vertexBufferLength, GLenum usage, const unsigned char* pIndexBuffer, GLuint indexBufferLength, bool bPT = true);
+	VertexBuffer(const void* pVertexBuffer, GLuint vertexStructureSize, GLuint vertexBufferLength, GLenum usage, const unsigned char* pIndexBuffer, GLuint indexBufferLength, bool bPT = true);
 	~VertexBuffer();
 
 	// Binds the vertex buffer object

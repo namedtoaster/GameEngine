@@ -548,10 +548,17 @@ void oglRenderer::SaveDisplayList()
 
 void oglRenderer::BuildRenderers()
 {
-	m_mesh.reset(new Mesh());
+	if(m_rm.LoadPLY("quadMesh", "quad.ply"))
+	{
+		PLYResource* pPly = static_cast<PLYResource*>(m_rm.GetResource("quadMesh", ResourceType::PLY));
+		if(pPly != nullptr)
+		{
+			m_mesh.reset(new Mesh(pPly));
 
-	m_pWorldSpaceSprites.reset(new AbstractRenderer(&m_rm, m_mesh));
-	m_pScreenSpaceSprites.reset(new AbstractRenderer(&m_rm, m_mesh, &m_OrthoCamera));
+			m_pWorldSpaceSprites.reset(new AbstractRenderer(&m_rm, m_mesh));
+			m_pScreenSpaceSprites.reset(new AbstractRenderer(&m_rm, m_mesh, &m_OrthoCamera));
+		}
+	}
 }
 
 void oglRenderer::BuildCamera()
