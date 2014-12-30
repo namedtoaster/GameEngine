@@ -21,7 +21,7 @@ m_pRenderer(nullptr), m_pInput(nullptr), m_bDrawFPS(false)
 
 	EnableEventWaiting(false);
 
-	LoadResourceFile("base.r",*this);
+	LoadResourceFile(*this, "base.r", "resources");
 }
 
 Game::~Game()

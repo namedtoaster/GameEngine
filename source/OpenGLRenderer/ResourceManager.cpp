@@ -46,7 +46,7 @@ const unsigned char* Cursor::GetImgData() const
 	return m_pImg;
 }
 
-PLYResource::PLYResource(const std::vector<float>& vertices, const std::vector<int>& faces, int numVertices, int vertexStructureSize)
+PLYResource::PLYResource(const std::vector<float>& vertices, const std::vector<unsigned short>& faces, int numVertices, int vertexStructureSize)
 	: m_vertices(vertices), m_faces(faces), m_numVertices(numVertices), m_vertexStructureSize(vertexStructureSize)
 {
 }
@@ -66,7 +66,7 @@ const std::vector<float>& PLYResource::GetVertices() const
 	return m_vertices;
 }
 
-const std::vector<int>& PLYResource::GetFaces() const
+const std::vector<unsigned short>& PLYResource::GetFaces() const
 {
 	return m_faces;
 }
@@ -481,7 +481,7 @@ void ResourceManager::GetOpenGLFormat(int comp, GLenum& format, GLint& internalF
 	}
 }
 
-bool ResourceManager::CreatePLYResource(const std::string &file, std::vector<float> &vertices, std::vector<int> &faces, int& numVertices, int& numVertexComponents)
+bool ResourceManager::CreatePLYResource(const std::string &file, std::vector<float> &vertices, std::vector<unsigned short> &faces, int& numVertices, int& numVertexComponents)
 {
 	std::fstream inStream;
 	inStream.open(file);
@@ -496,7 +496,6 @@ bool ResourceManager::CreatePLYResource(const std::string &file, std::vector<flo
 		return false;
 
 	bool endOfHeader = false;
-	int numFaces = 0;
 	int currentVertex = 0;
 	numVertexComponents = 0;
 	numVertices = 0;
@@ -534,10 +533,6 @@ bool ResourceManager::CreatePLYResource(const std::string &file, std::vector<flo
 				if(arg == "vertex")
 				{
 					numVertices = numberOfElements;
-				}
-				else if(arg == "face")
-				{
-					numFaces = numberOfElements;
 				}
 			}
 			else if(command == "property")
@@ -595,7 +590,7 @@ bool ResourceManager::CreatePLYResource(const std::string &file, std::vector<flo
 				int listSize = 0;
 				stream >> listSize;
 
-				std::vector<int> faceList(listSize);
+				std::vector<unsigned short> faceList(listSize);
 
 				for(int i = 0; i < listSize; ++i)
 				{
@@ -694,7 +689,7 @@ bool ResourceManager::LoadPLY(const std::string& id, const std::string& file)
 	}
 
 	std::vector<float> vertices;
-	std::vector<int> faces;
+	std::vector<unsigned short> faces;
 	int numVertices = 0;
 	int numVertexComponents = 0;
 

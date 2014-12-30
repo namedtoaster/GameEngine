@@ -5,5 +5,3 @@ font font textures/font.png
 texture button textures/button.png
 texture blank textures/blank.png
 
-
-

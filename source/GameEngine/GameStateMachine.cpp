@@ -14,7 +14,7 @@ void GameStateMachine::SetState(const std::string& state, Game& game)
 	IPlugin* pPlugin = game.GetPM().LoadPlugin("./plugin/" + state + '/' + state);
 	assert(pPlugin->GetPluginType() == DLLType::Game);
 
-	LoadResourceFile(string(pPlugin->GetName()) + ".r",game,"./plugin/" + string(pPlugin->GetName()));
+	LoadResourceFile(game, string(pPlugin->GetName()) + ".r", "./plugin/" + string(pPlugin->GetName()));
 
 	m_pCurrentState = static_cast<IGameState*>(pPlugin);
 	m_pCurrentState->Init(game);
@@ -24,7 +24,6 @@ void GameStateMachine::SetState(const std::string& state, Game& game)
 
 	// update window caption
 	glfwSetWindowTitle(glfwGetCurrentContext(),state.c_str());
-
 }
 
 void GameStateMachine::RemoveState(Game& game)

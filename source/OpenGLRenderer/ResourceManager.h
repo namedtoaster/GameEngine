@@ -66,13 +66,13 @@ class PLYResource : public IResource
 public:
 
 	// TODO: instead of passing in the verts and the faces, let the ply resource load the file?
-	PLYResource(const std::vector<float>& vertices, const std::vector<int>& faces,
+	PLYResource(const std::vector<float>& vertices, const std::vector<unsigned short>& faces,
 				int numVertices, int vertexStructureSize);
 
 	void* QueryInterface(ResourceType type) const override;
 
 	const std::vector<float>& GetVertices() const;
-	const std::vector<int>& GetFaces() const;
+	const std::vector<unsigned short>& GetFaces() const;
 	int GetNumVertices() const;
 	int GetVertexStructureSize() const;
 
@@ -83,7 +83,7 @@ protected:
 private:
 
 	std::vector<float> m_vertices;
-	std::vector<int> m_faces;
+	std::vector<unsigned short> m_faces;
 	int m_numVertices;
 	int m_vertexStructureSize;
 };
@@ -294,7 +294,7 @@ private:
 
 	ResourceMap m_resources;
 
-	bool CreatePLYResource(const std::string& file, std::vector<float>& vertices, std::vector<int>& faces, int& numVertices, int& numVertexComponents);
+	bool CreatePLYResource(const std::string& file, std::vector<float>& vertices, std::vector<unsigned short>& faces, int& numVertices, int& numVertexComponents);
 
 	bool CreateTexture(const std::string& file, int& width, int& height, int& comp, unsigned char** pImgData);
 	bool CreateOpenGLTexture(const std::string& file, int& width, int& height, int& comp, unsigned char** pImgData, GLuint& out);

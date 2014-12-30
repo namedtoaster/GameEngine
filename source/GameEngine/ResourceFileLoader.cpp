@@ -4,7 +4,7 @@
 
 #include <sstream>
 
-void LoadResourceFile(const std::string& file, Game& game, const std::string& folder)
+void LoadResourceFile(Game& game, const std::string& file, const std::string& folder)
 {
 	IResourceManager& gfxResourceManager = game.GetRenderer().GetResourceManager();
 

@@ -8,6 +8,6 @@
 	 * texture UniqueStringID PathToImage/img.png
 	 * shader UniqueStringID3 PathToShader/VertexShader.vert PathToShader/FragmentShader.frag
 	 **/
-void LoadResourceFile(const std::string& file, class Game& ,const std::string& folder = ".");
+void LoadResourceFile(class Game&, const std::string& file ,const std::string& folder = ".");
 
 #endif // _RESOURCEFILELOADER_
